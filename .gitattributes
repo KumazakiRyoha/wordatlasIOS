@@ -1,0 +1,2 @@
+# Build scripts are also edited on Windows and executed by macOS CI.
+*.sh text eol=lf

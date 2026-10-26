@@ -4,6 +4,7 @@ import { useAtlas } from "../atlas/context";
 import { isMastered } from "../store/srs";
 import { dayKey, exportBackup, importBackup, resetProgress, store, useStore, type Settings } from "../store/store";
 import { toast } from "../ui/Toast";
+import { isNative, saveBackup } from "../lib/native";
 import { streakOf } from "./Today";
 
 export function Me({ privateAvailable }: { privateAvailable: boolean }) {
@@ -33,13 +34,12 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
   }, [progress]);
 
   const set = (patch: Partial<Settings>) => store.settings(patch);
-  const download = () => {
-    const blob = new Blob([exportBackup()], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `word-atlas-backup-${dayKey()}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  const download = async () => {
+    try {
+      await saveBackup(exportBackup(), `word-atlas-backup-${dayKey()}.json`);
+    } catch {
+      toast("未完成备份分享，请重试并选择保存到文件。", "warn");
+    }
   };
   const restore = async (f: File) => {
     if (f.size > 30 * 1024 * 1024) return toast("文件太大，不像是学习备份。", "warn");
@@ -181,7 +181,7 @@ export function Me({ privateAvailable }: { privateAvailable: boolean }) {
 
         <section className="panel">
           <h3 className="eyebrow">数据</h3>
-          <p className="muted">进度只存在这台设备的浏览器里：没有账号，没有服务器。换设备时，导出备份再导入即可。</p>
+          <p className="muted">{isNative ? "进度只保存在这台设备的应用里。换设备或卸载前，请导出备份；可通过系统分享保存到文件，再在新设备导入。" : "进度只存在这台设备的浏览器里：没有账号，没有服务器。换设备时，导出备份再导入即可。"}</p>
           {saveError && <p className="warn-text">浏览器拒绝保存（可能是隐私模式或空间已满）。请尽快导出备份。</p>}
           <div className="data-actions">
             <button className="btn btn-ghost" onClick={download}>

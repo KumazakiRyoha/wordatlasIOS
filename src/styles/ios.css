@@ -1,0 +1,56 @@
+/* Keep the original palette, typography and components; adapt only to iOS chrome. */
+html.is-native {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+  scroll-padding-top: calc(var(--top) + env(safe-area-inset-top) + 12px);
+}
+.is-native .topbar {
+  height: calc(var(--top) + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+}
+.is-native .learn-top {
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+.is-native .app {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.is-native .sheet {
+  max-height: calc(100dvh - env(safe-area-inset-top) - 12px);
+}
+.is-native .sheet-root {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.is-native .tabbar {
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+.is-native .palette-root {
+  padding-top: calc(env(safe-area-inset-top) + 16px);
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+}
+.is-native .palette {
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.is-native .palette-input { flex-shrink: 0; }
+.is-native .palette-list { min-height: 0; }
+.is-native .onboard-card {
+  max-height: calc(100dvh - env(safe-area-inset-top));
+}
+.is-native .icon-btn { min-width: 44px; min-height: 44px; }
+html.is-native.keyboard-open .tabbar { display: none; }
+.is-native input:not([type="checkbox"]):not([type="range"]),
+.is-native select, .is-native textarea { font-size: max(16px, 1em); }
+.is-native button, .is-native a { touch-action: manipulation; }
+.is-native .splash-skip { right: max(20px, env(safe-area-inset-right)); }
+@media (min-width: 760px) {
+  .is-native .sheet-root {
+    padding-left: max(32px, env(safe-area-inset-left));
+    padding-right: max(32px, env(safe-area-inset-right));
+  }
+}

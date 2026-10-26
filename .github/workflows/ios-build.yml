@@ -1,0 +1,83 @@
+name: Build iPhone IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/ios-app, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build unsigned iPhone app
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests and validate bundled vocabulary
+        run: |
+          npm test
+          npm run check:atlas
+
+      - name: Build and synchronize iOS resources
+        run: npm run ios:sync
+
+      - name: Compile iPhone app and package unsigned IPA
+        run: bash scripts/build-ios-unsigned.sh
+
+      - name: Upload IPA for Windows sideloading
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: WordAtlas-iPhone-unsigned
+          path: |
+            build/WordAtlas-unsigned.ipa
+            build/WordAtlas-unsigned.ipa.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 1
+
+      - name: Upload build log
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ios-build-log
+          path: build/ios-build.log
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Write download instructions
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## iPhone test build
+          Commit: \`$SOURCE_SHA\`
+
+          Download **WordAtlas-iPhone-unsigned** from this run's Artifacts section.
+          Extract the downloaded ZIP on Windows to find **WordAtlas-unsigned.ipa**.
+          Use Sideloadly to sign and install this IPA on your own iPhone.
+          This is an unsigned device build, not an App Store or TestFlight upload.
+
+          The artifact includes the full offline vocabulary and media. It expires after one day.
+          See [Windows installation instructions](https://github.com/$SOURCE_REPOSITORY/blob/$SOURCE_SHA/docs/windows-iphone.md).
+          EOF

@@ -9,3 +9,12 @@ output/
 .DS_Store
 .playwright-cli/
 *.tsbuildinfo
+ios/App/App/public/
+ios/App/App/capacitor.config.json
+ios/App/App/config.xml
+ios/App/Pods/
+ios/DerivedData/
+*.xcuserstate
+xcuserdata/
+.pnpm-store/
+/build/
