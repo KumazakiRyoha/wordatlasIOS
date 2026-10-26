@@ -4,6 +4,7 @@ import { AtlasContext, useAtlas, useEntry } from "./atlas/context";
 import { loadOpenAtlas, loadPrivateAtlas } from "./atlas/data";
 import type { Atlas } from "./atlas/types";
 import { REPO_URL } from "./config";
+import { updateNativeTheme } from "./lib/native";
 import { closeWord, currentLocation, go, openWord, useLocation, type Route } from "./lib/router";
 import { AtlasPage } from "./pages/Atlas";
 import { About } from "./pages/About";
@@ -37,6 +38,14 @@ function useTheme() {
     else root.setAttribute("data-theme", theme);
     const dark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0D1120" : "#F6F1E7");
+    const sync = () => {
+      const isDark = theme === "dark" || (theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+      void updateNativeTheme(isDark).catch(() => null);
+    };
+    sync();
+    const media = matchMedia("(prefers-color-scheme: dark)");
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, [theme]);
   return theme;
 }

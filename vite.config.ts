@@ -84,9 +84,9 @@ function localMedia(
     res.end();
   }
 }
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   // Deploy under a sub-path with ATLAS_BASE=/words/ npm run build
-  base: process.env.ATLAS_BASE || "/",
+  base: mode === "ios" ? "/" : process.env.ATLAS_BASE || "/",
   plugins: [
     react(),
     {
@@ -102,4 +102,4 @@ export default defineConfig({
   server: { port: 5188, strictPort: true },
   preview: { port: 5188, strictPort: true },
   build: { chunkSizeWarningLimit: 600 },
-});
+}));

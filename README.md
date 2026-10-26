@@ -4,6 +4,10 @@
 
 # 词光 · Word Atlas
 
+> iOS 开发分支：保留原网页界面，通过 Capacitor 打包为 iOS 应用。运行和验证步骤见 [docs/ios.md](docs/ios.md)。
+
+> Windows + iPhone：通过 GitHub Actions 获取 IPA，再在 Windows 签名安装。见 [安装说明](docs/windows-iphone.md)。
+
 **一词一画，点亮雅思。**
 
 7,298 个雅思核心词，每个词一幅原创插画、两条原创例句、英美发音和一套刚刚好的复习节奏。<br>
